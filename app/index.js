@@ -62,10 +62,10 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
     const error = {
-        msg: err.message,
-        code: err.code,
+        ...err,
     };
-
+    error.msg = error.message;
+    delete error.message;
     // return json response to client
     res.status(err.status || 500);
     res.json({ error });
