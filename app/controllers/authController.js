@@ -20,8 +20,7 @@ const signUp = async (req, res, next) => {
         let userEixst = await User.findOne({
             $or: [{ userName: data.username }, { userMail: data.email }],
         });
-        if (userEixst)
-            throw createError.Conflict();
+        if (userEixst) throw createError.Conflict();
         let newUser = new User({
             userName: data.username,
             userMail: data.email,
@@ -39,7 +38,7 @@ const signUp = async (req, res, next) => {
         // TODO : uncommment this line in production
         // sendConfirmation(newUser, "Confirm Your Account 😇", "confirmAccount");
         res.status(201);
-        res.json({ code: 2062 });
+        res.end();
     } catch (err) {
         next(err);
     }
@@ -60,17 +59,15 @@ const signIn = async (req, res, next) => {
                 __v: 0,
             }
         );
-        if (!user)
-            throw createError.NotFound();
+        if (!user) throw createError.NotFound();
         let isMatched = await user.isValidPassword(data.password);
         let isConfirmed = await user.isConfirmed();
         if (!isMatched) {
             throw createError.Unauthorized();
         } else if (!isConfirmed)
-            throw createError.Unauthorized();
-
+            throw createError(401, null, { notConfirmed: true });
         let accessToken = await signAccessToken(user.userName, data.rememberMe);
-        resp = { user: { ...user._doc }, accessToken: accessToken, code: 2032 };
+        resp = { user: { ...user._doc }, accessToken: accessToken };
         delete resp.user.userPass;
         res.json(resp);
     } catch (err) {
@@ -87,11 +84,10 @@ const confirmAccount = async (req, res, next) => {
         });
         let email = await verifyConfirmationToken(data.token);
         let user = await User.findOne({ userMail: email });
-        if (!user && user.isConfirmed())
-            throw createError.Unauthorized();
+        if (!user && user.isConfirmed()) throw createError.Unauthorized();
         user.confirmAccount();
         await user.save();
-        res.json({ msg: "Account confirmed succesfully !", code: 2041 });
+        res.json({ msg: "Account confirmed succesfully !" });
     } catch (err) {
         next(err);
     }
@@ -103,8 +99,7 @@ const forgotPassword = async (req, res, next) => {
     try {
         let data = await authValidator(req.body, { email: 1 });
         let user = await User.findOne({ userMail: data.email });
-        if (!user)
-            throw createError.NotFound();
+        if (!user) throw createError.NotFound();
         user.externalURL = req.externalURL;
         let repeats = await client.getAsync(`${user.userMail}:FP`);
         if (repeats > 4) {
@@ -120,7 +115,6 @@ const forgotPassword = async (req, res, next) => {
         sendForgotPassword(user, "Reset Your Password");
         res.json({
             msg: "An email has been sent !",
-            code: 2013,
         });
     } catch (err) {
         next(err);
@@ -136,18 +130,16 @@ const resetPassword = async (req, res, next) => {
             userId: 1,
         });
         let user = await User.findOne({ _id: params.userId });
-        if (!user)
-            throw createError.Unauthorized();
+        if (!user) throw createError.Unauthorized();
         let email = await verifyForgotPassword(params.token, user.userPass);
-        if (user.userMail !== email)
-            throw createError.Unauthorized();
+        if (user.userMail !== email) throw createError.Unauthorized();
         if (req.method === "GET") {
             res.json({ email });
         } else if (req.method === "POST") {
             let data = await authValidator(req.body, { password: 1 });
             await user.resetPassword(data.password); // hash password with bcrypt
             user.save();
-            res.json({ msg: "The password has been update !", code: 2029 });
+            res.json({ msg: "The password has been update !" });
         } else {
             throw createError.Forbidden();
         }
@@ -162,8 +154,7 @@ const reSendConfirmation = async (req, res, next) => {
     try {
         let data = await authValidator(req.body, { email: 1 });
         let user = await User.findOne({ userMail: data.email });
-        if (!user)
-            throw createError.NotFound();
+        if (!user) throw createError.NotFound();
         user.externalURL = req.externalURL;
         let repeats = await client.getAsync(`${user.userMail}:RC`);
         if (repeats > 4) {
@@ -177,10 +168,7 @@ const reSendConfirmation = async (req, res, next) => {
             client.expire(`${user.userMail}:RC`, 86400);
         }
         sendConfirmation(user, "Confirm Your Account 😇");
-        res.json({
-            code: 2051,
-            msg: "An email has been sent !",
-        });
+        res.json({ msg: "An email has been sent !" });
     } catch (err) {
         next(err);
     }
