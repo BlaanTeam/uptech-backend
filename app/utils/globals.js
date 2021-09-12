@@ -16,18 +16,6 @@ function normalizePort(val) {
     return false;
 }
 
-// create http errors
-
-class createError extends Error {
-    constructor(message, code, status) {
-        super();
-        Error.captureStackTrace(this, this.constructor);
-        this.message = message;
-        this.code = code;
-        this.status = status;
-    }
-}
 module.exports = {
-    normalizePort,
-    createError,
+    normalizePort
 };
