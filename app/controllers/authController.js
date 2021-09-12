@@ -7,7 +7,7 @@ const {
 } = require("../utils/jwt");
 const { authValidator } = require("../utils/validationSchema");
 const { sendConfirmation, sendForgotPassword } = require("../utils/mailer");
-const client = require("../utils/redis");
+const { client } = require("../utils/redis");
 
 // this function will handle the sign-up process
 const signUp = async (req, res, next) => {
