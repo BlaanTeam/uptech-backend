@@ -12,10 +12,10 @@ npm i --save
 
 After installing all dependencies, you must create a new file `.env` and put inside it the following.
 
-```env
+```
 ENV=development
 PORT=5000
-
+DB_DNS_SRV=disabled
 DB_HOST=localhost
 DB_PORT=27017
 DB_USER=DB USER
