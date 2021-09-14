@@ -20,6 +20,7 @@ const authRouter = require("./routes/authRouter");
 const postRouter = require("./routes/postRouter");
 const profileRouter = require("./routes/profileRouter");
 const chatRouter = require("./routes/chatRouter");
+const notificationRouter = require("./routes/notificationRouter");
 // Iniatialize server & app
 const app = express();
 app.set("port", port);
@@ -53,6 +54,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/feed", postRouter);
 app.use("/api/v1/users", profileRouter);
 app.use("/api/v1/chats", chatRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
