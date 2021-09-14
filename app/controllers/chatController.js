@@ -158,8 +158,7 @@ const getConversations = async (req, res, next) => {
                                                 {
                                                     $size: {
                                                         $filter: {
-                                                            input:
-                                                                "$readByRecipients",
+                                                            input: "$readByRecipients",
                                                             as: "array",
                                                             cond: {
                                                                 $eq: [
@@ -527,7 +526,7 @@ const deleteMessage = async (req, res, next) => {
         let params = await chatValidator(req.params, { messageId: 1 });
         let message = await Message.findOne(
             { _id: params.messageId },
-            { _id: 1, userId: 1 }
+            { _id: 1, userId: 1, convId: 1 }
         );
         if (!message) {
             throw createError.NotFound();
@@ -536,6 +535,16 @@ const deleteMessage = async (req, res, next) => {
         }
         // remove it from messages
         await message.remove();
+        await Conversation.findOneAndUpdate(
+            {
+                _id: message.convId,
+            },
+            {
+                $pull: {
+                    messages: message._id,
+                },
+            }
+        );
         res.status(204).end();
     } catch (err) {
         next(err);
