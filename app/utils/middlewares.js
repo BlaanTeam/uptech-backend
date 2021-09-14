@@ -1,20 +1,20 @@
-const { createError } = require("./globals");
 const { verifyAccessToken, signAccessToken } = require("./jwt");
 const { User } = require("../models/authModel");
+const createError = require("http-errors");
 
 // this function will protect the route by check the access token if exist in headers and if really valid
 const protectRouter = (router) => {
     router.use(async (req, res, next) => {
         try {
             if (!req.headers.hasOwnProperty("x-auth-token"))
-                throw new createError("Unauthorized !", 1075, 401);
+                throw createError.Unauthorized();
             let accessToken = req.headers["x-auth-token"]?.trim();
             let payload = await verifyAccessToken(accessToken);
             let user = await User.findOne(
                 { userName: payload.username },
                 { userPass: 0 }
             );
-            if (!user) throw new createError("Unauthorized !", 1030, 401);
+            if (!user) throw createError.unauthorized();
             req.currentUser = user;
             next();
         } catch (err) {
@@ -26,7 +26,7 @@ const protectRouter = (router) => {
 const protectSocketIo = async (socket, next) => {
     try {
         if (!socket.handshake.headers.hasOwnProperty("x-auth-token")) {
-            throw new createError("Unauthorized !", 1075, 401);
+            throw createError.Unauthorized();
         }
         let accessToken = socket.handshake.headers["x-auth-token"]?.trim();
         let payload = await verifyAccessToken(accessToken);
@@ -34,7 +34,7 @@ const protectSocketIo = async (socket, next) => {
             { userName: payload.username },
             { userPass: 0 }
         );
-        if (!user) throw new createError("Unauthorized !", 1030, 401);
+        if (!user) throw createError.Unauthorized();
         socket.currentUser = user;
         next();
     } catch (err) {
