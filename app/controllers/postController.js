@@ -11,7 +11,7 @@ const {
 const getFeedPosts = async (req, res, next) => {
     try {
         let query = await postValidator(req.query, { createdAt: 2 });
-        let perPage = 20;
+        let perPage = 10;
         let following = await Follow.find({
             userOne: req.currentUser._id,
             status: 2,
