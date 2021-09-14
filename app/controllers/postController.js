@@ -1238,7 +1238,13 @@ const likePost = async (req, res, next) => {
             throw createError.NotFound();
         } else if (post.isPrivate && !post.isOwner) {
             throw createError.Forbidden();
-        } else if (!post.like) {
+        }
+        let payload = {};
+        payload.sender = req.currentUser._id;
+        payload.receiver = post.user._id;
+        payload.notificationType = 0;
+        payload.postId = post._id;
+        if (!post.like) {
             let like = new Like({
                 user: req.currentUser._id,
                 postId: post._id,
@@ -1256,6 +1262,7 @@ const likePost = async (req, res, next) => {
                     new: true,
                 }
             );
+            if (!post.isOwner) addNotification(payload);
         } else if (post.likedByViewer) {
             let like = await Like.findOne({
                 postId: post._id,
@@ -1289,6 +1296,7 @@ const likePost = async (req, res, next) => {
                     },
                 }
             );
+            if (!post.isOwner) addNotification(payload);
         }
         res.status(204);
         res.end();
