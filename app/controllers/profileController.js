@@ -1,5 +1,6 @@
 const { User, Follow } = require("../models/authModel");
 const { profileValidator } = require("../utils/validationSchema");
+const { addNotification } = require("./notificationController");
 const createError = require("http-errors");
 
 const getUser = async (req, res, next) => {
@@ -584,7 +585,12 @@ const followUser = async (req, res, next) => {
             res.status(304);
             res.end();
             return;
-        } else if (!user.followOne) {
+        }
+        let payload = {};
+        payload.sender = req.currentUser._id;
+        payload.receiver = user._id;
+        payload.notificationType = 2;
+        if (!user.followOne) {
             //  create new follow document
             let newFollow = new Follow({
                 userOne: req.currentUser._id,
@@ -592,6 +598,8 @@ const followUser = async (req, res, next) => {
                 status: user.isPrivate ? 1 : 2,
             });
             await newFollow.save();
+            if (payload.sender.toString() != payload.receiver.toString())
+                addNotification(payload);
         } else if (user.followOne.status === 0) {
             // update exist document
             let follow = await Follow.findOneAndUpdate(
@@ -603,6 +611,8 @@ const followUser = async (req, res, next) => {
                     status: user.isPrivate ? 1 : 2,
                 }
             );
+            if (payload.sender.toString() != payload.receiver.toString())
+                addNotification(payload);
         } else {
             throw createError.Forbidden();
         }
