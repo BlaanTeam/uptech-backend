@@ -6,6 +6,7 @@ const {
     postValidator,
     commentValidator,
 } = require("../utils/validationSchema");
+const { addNotification } = require("./notificationController");
 
 // This function will handle retrieving feed posts process
 const getFeedPosts = async (req, res, next) => {
@@ -964,6 +965,13 @@ const addComment = async (req, res, next) => {
             .execPopulate();
         post.comments.push(comment._id);
         await post.save();
+        let payload = {};
+        payload.sender = req.currentUser._id;
+        payload.receiver = post.user;
+        payload.notificationType = 1;
+        payload.postId = comment.postId;
+        if (payload.sender.toString() != payload.receiver.toString())
+            addNotification(payload);
         res.json({ comment });
     } catch (err) {
         next(err);
