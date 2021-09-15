@@ -1,6 +1,6 @@
 const { Notification } = require("../models/notificationModel");
 const { isUserActive, getSessions } = require("../utils/redis");
-const { chatValidator } = require("../utils/validationSchema");
+const { notificationValidator } = require("../utils/validationSchema");
 const socket = require("../utils/socketIo");
 const createError = require("http-errors");
 
@@ -32,7 +32,7 @@ const getNotifications = async (req, res, next) => {
     try {
         let currentUser = req.currentUser;
         let perPage = 10;
-        let query = await chatValidator(req.query, { createdAt: 2 });
+        let query = await notificationValidator(req.query, { createdAt: 2 });
         let matchQuery = {};
         if (query.createdAt) {
             matchQuery = {
