@@ -43,6 +43,6 @@ const notifSchema = new Schema({
 });
 
 module.exports = {
-    Notif: Model("notifs", notifSchema),
+    Notif: Model("notifications", notifSchema),
     notifTypes,
 };
