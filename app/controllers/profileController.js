@@ -1708,7 +1708,7 @@ const getUserPosts = async (req, res, next) => {
     try {
         let params = await profileValidator(req.params, { userName: 1 });
         let query = await profileValidator(req.query, { page: 2 });
-        let perPage =10;
+        let perPage = 10;
         let pageNumber = query.page;
         let user = await User.aggregate([
             {

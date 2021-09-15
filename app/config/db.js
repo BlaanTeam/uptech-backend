@@ -4,7 +4,7 @@ const {
 } = require("./config");
 
 const isDnsSrvEnabled =
-    process.env.DB_DNS_SRV.toLowerCase() === 'enabled' ? true : false;
+    process.env.DB_DNS_SRV.toLowerCase() === "enabled" ? true : false;
 
 const dbURI = `mongodb${
     isDnsSrvEnabled ? "+srv" : ""

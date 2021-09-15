@@ -17,5 +17,5 @@ function normalizePort(val) {
 }
 
 module.exports = {
-    normalizePort
+    normalizePort,
 };

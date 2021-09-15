@@ -4,7 +4,8 @@ const commonConfig = {
     },
     pattern: {
         username: /^[a-zA-Z0-9_-]{4,16}$/,
-        password: /(?=(.*[0-9]))(?=.*[\!@#$%^&*()\\[\]{}\-_+=~`|:;"'<>,./?])(?=.*[a-z])(?=(.*[A-Z]))(?=(.*)).{8,}/,
+        password:
+            /(?=(.*[0-9]))(?=.*[\!@#$%^&*()\\[\]{}\-_+=~`|:;"'<>,./?])(?=.*[a-z])(?=(.*[A-Z]))(?=(.*)).{8,}/,
         email: /^([a-z0-9_\.\+-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/,
         bio: /^[^\n]{2,100}$/,
         jwtToken: /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/,
@@ -36,7 +37,7 @@ const commonConfig = {
     redisConfig: {
         host: process.env.REDIS_HOST,
         port: parseInt(process.env.REDIS_PORT) | 6379,
-        authPass:process.env.REDIS_PASS
+        authPass: process.env.REDIS_PASS,
     },
 };
 
