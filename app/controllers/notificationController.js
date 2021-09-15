@@ -90,7 +90,29 @@ const getNotifications = async (req, res, next) => {
     }
 };
 
+const deleteNotification = async (req, res, next) => {
+    try {
+        let currentUser = req.currentUser;
+        let { notificationId } = await notificationValidator(req.params, {
+            notificationId: 1,
+        });
+
+        let notification = await Notification.findOne({ _id: notificationId });
+        if (!notification) throw createError.NotFound();
+        else if (
+            notification.receiver.toString() !== currentUser._id.toString()
+        )
+            throw createError.Forbidden();
+        await notification.remove();
+        res.status(204);
+        res.end();
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
     addNotification,
     getNotifications,
+    deleteNotification,
 };
