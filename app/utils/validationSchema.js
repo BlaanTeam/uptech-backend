@@ -205,14 +205,14 @@ const chatValidator = async (credentials, selectors) => {
     }
 };
 
-const notificationValidator = async (credentials, selectors) => {
+const notifValidator = async (credentials, selectors) => {
     try {
-        notificationSchema = joi.object({
-            notificationId: objectId("Conversation Doesn't Exist!"),
+        notifSchema = joi.object({
+            notifId: objectId("Conversation Doesn't Exist!"),
             createdAt: joi.date().optional(),
         });
-        notificationSchema = validator(notificationSchema, selectors);
-        return await notificationSchema.validateAsync(credentials);
+        notifSchema = validator(notifSchema, selectors);
+        return await notifSchema.validateAsync(credentials);
     } catch (err) {
         if (err.isJoi) {
             err.status = 400;
@@ -230,5 +230,5 @@ module.exports = {
     profileValidator,
     followValidator,
     chatValidator,
-    notificationValidator,
+    notifValidator,
 };

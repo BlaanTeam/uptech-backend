@@ -1,14 +1,14 @@
-const { Notification } = require("../models/notificationModel");
+const { Notif } = require("../models/notifModel");
 const { isUserActive, getSessions } = require("../utils/redis");
-const { notificationValidator } = require("../utils/validationSchema");
+const { notifValidator } = require("../utils/validationSchema");
 const socket = require("../utils/socketIo");
 const createError = require("http-errors");
 
-const addNotification = async (payload) => {
+const addNotif = async (payload) => {
     try {
-        let notification = new Notification(payload);
-        await notification.save();
-        await notification
+        let notif = new Notif(payload);
+        await notif.save();
+        await notif
             .populate({
                 path: "sender",
                 select: "userName profile",
@@ -21,18 +21,18 @@ const addNotification = async (payload) => {
                 socket.to(id);
             });
             // emit the message event
-            socket.emit("notification", notification);
+            socket.emit("notif", notif);
         }
     } catch (err) {
         throw err;
     }
 };
 
-const getNotifications = async (req, res, next) => {
+const getNotifs = async (req, res, next) => {
     try {
         let currentUser = req.currentUser;
         let perPage = 10;
-        let query = await notificationValidator(req.query, { createdAt: 2 });
+        let query = await notifValidator(req.query, { createdAt: 2 });
         let matchQuery = {};
         if (query.createdAt) {
             matchQuery = {
@@ -50,7 +50,7 @@ const getNotifications = async (req, res, next) => {
                 receiver: currentUser._id,
             };
         }
-        let notifications = await Notification.aggregate([
+        let notifs = await Notif.aggregate([
             { $match: matchQuery },
             {
                 $lookup: {
@@ -84,26 +84,24 @@ const getNotifications = async (req, res, next) => {
             },
             { $limit: perPage },
         ]);
-        res.json(notifications);
+        res.json(notifs);
     } catch (err) {
         next(err);
     }
 };
 
-const deleteNotification = async (req, res, next) => {
+const deleteNotif = async (req, res, next) => {
     try {
         let currentUser = req.currentUser;
-        let { notificationId } = await notificationValidator(req.params, {
-            notificationId: 1,
+        let { notifId } = await notifValidator(req.params, {
+            notifId: 1,
         });
 
-        let notification = await Notification.findOne({ _id: notificationId });
-        if (!notification) throw createError.NotFound();
-        else if (
-            notification.receiver.toString() !== currentUser._id.toString()
-        )
+        let notif = await Notif.findOne({ _id: notifId });
+        if (!notif) throw createError.NotFound();
+        else if (notif.receiver.toString() !== currentUser._id.toString())
             throw createError.Forbidden();
-        await notification.remove();
+        await notif.remove();
         res.status(204);
         res.end();
     } catch (err) {
@@ -112,7 +110,7 @@ const deleteNotification = async (req, res, next) => {
 };
 
 module.exports = {
-    addNotification,
-    getNotifications,
-    deleteNotification,
+    addNotif,
+    getNotifs,
+    deleteNotif,
 };

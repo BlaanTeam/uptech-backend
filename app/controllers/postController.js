@@ -6,7 +6,7 @@ const {
     postValidator,
     commentValidator,
 } = require("../utils/validationSchema");
-const { addNotification } = require("./notificationController");
+const { addNotif } = require("./notifController");
 
 // This function will handle retrieving feed posts process
 const getFeedPosts = async (req, res, next) => {
@@ -968,10 +968,10 @@ const addComment = async (req, res, next) => {
         let payload = {};
         payload.sender = req.currentUser._id;
         payload.receiver = post.user;
-        payload.notificationType = 1;
+        payload.notifType = 1;
         payload.postId = comment.postId;
         if (payload.sender.toString() != payload.receiver.toString())
-            addNotification(payload);
+            addNotif(payload);
         res.json({ comment });
     } catch (err) {
         next(err);
@@ -1242,7 +1242,7 @@ const likePost = async (req, res, next) => {
         let payload = {};
         payload.sender = req.currentUser._id;
         payload.receiver = post.user._id;
-        payload.notificationType = 0;
+        payload.notifType = 0;
         payload.postId = post._id;
         if (!post.like) {
             let like = new Like({
@@ -1262,7 +1262,7 @@ const likePost = async (req, res, next) => {
                     new: true,
                 }
             );
-            if (!post.isOwner) addNotification(payload);
+            if (!post.isOwner) addNotif(payload);
         } else if (post.likedByViewer) {
             let like = await Like.findOne({
                 postId: post._id,
@@ -1296,7 +1296,7 @@ const likePost = async (req, res, next) => {
                     },
                 }
             );
-            if (!post.isOwner) addNotification(payload);
+            if (!post.isOwner) addNotif(payload);
         }
         res.status(204);
         res.end();
