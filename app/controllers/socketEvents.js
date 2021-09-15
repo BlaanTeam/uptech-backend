@@ -1,4 +1,5 @@
-const { Message } = require("../models/chatModel");
+const { Message, Conversation } = require("../models/chatModel");
+const { Notif } = require("../models/notifModel");
 const { isUserActive, getSessions } = require("../utils/redis");
 const { chatValidator } = require("../utils/validationSchema");
 const createError = require("http-errors");
@@ -131,7 +132,100 @@ const markReadEvent = async (socket, payload) => {
         socket.emit("error", err);
     }
 };
+
+const countUnRead = async (socket, payload) => {
+    try {
+        let currentUser = socket.currentUser;
+        let notifs = await Notif.aggregate([
+            {
+                $match: {
+                    $and: [
+                        { receiver: currentUser._id },
+                        {
+                            isRead: false,
+                        },
+                    ],
+                },
+            },
+            {
+                $sort: {
+                    createdAt: -1,
+                },
+            },
+            {
+                $limit: 10,
+            },
+            { $count: "notifsCount" },
+        ]);
+        let msgs = await Conversation.aggregate([
+            {
+                $match: {
+                    $and: [
+                        { userIds: currentUser._id },
+                        { messages: { $elemMatch: { $exists: true } } },
+                    ],
+                },
+            },
+            {
+                $addFields: {
+                    lastMessage: {
+                        $arrayElemAt: ["$messages", -1],
+                    },
+                },
+            },
+
+            {
+                $sort: {
+                    timestamp: -1,
+                },
+            },
+            {
+                $limit: 10,
+            },
+            {
+                $lookup: {
+                    from: "messages",
+                    let: { msgId: "$lastMessage", userId: currentUser._id },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        {
+                                            $eq: ["$_id", "$$msgId"],
+                                        },
+                                        {
+                                            $ne: ["$userId", "$$userId"],
+                                        },
+                                        {
+                                            $eq: [
+                                                { $size: "$readByRecipients" },
+                                                1,
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                    as: "lastMessage",
+                },
+            },
+            { $unwind: "$lastMessage" },
+            {
+                $count: "msgsCount",
+            },
+        ]);
+        let msgsCount = !msgs[0] ? 0 : msgs[0].msgsCount;
+        let notifsCount = !notifs[0] ? 0 : notifs[0].notifsCount;
+        socket.emit("count-unread", { msgsCount, notifsCount });
+    } catch (err) {
+        console.log(err);
+        socket.emit("error", err);
+    }
+};
 module.exports = {
     typingEvent,
     markReadEvent,
+    countUnRead,
 };
