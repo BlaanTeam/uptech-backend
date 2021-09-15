@@ -14,7 +14,7 @@ const protectRouter = (router) => {
                 { userName: payload.username },
                 { userPass: 0 }
             );
-            if (!user) throw createError.unauthorized();
+            if (!user && !user.mailConfirmed) throw createError.unauthorized();
             req.currentUser = user;
             next();
         } catch (err) {
@@ -34,7 +34,7 @@ const protectSocketIo = async (socket, next) => {
             { userName: payload.username },
             { userPass: 0 }
         );
-        if (!user) throw createError.Unauthorized();
+        if (!user && !user.mailConfirmed) throw createError.Unauthorized();
         socket.currentUser = user;
         next();
     } catch (err) {
