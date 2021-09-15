@@ -42,7 +42,7 @@ const getConversations = async (req, res, next) => {
     try {
         let currentUser = req.currentUser;
         let query = await chatValidator(req.query, { createdAt: 2 });
-        let perPage = 20;
+        let perPage =10;
         let matchQuery = {};
         if (query.createdAt) {
             matchQuery = {
@@ -348,7 +348,7 @@ const getMessages = async (req, res, next) => {
     try {
         let currentUser = req.currentUser;
         let params = await chatValidator(req.params, { convId: 1 });
-        let perPage = 20;
+        let perPage =10;
         let query = await chatValidator(req.query, { createdAt: 2 });
         let matchQuery = {};
         if (query.createdAt) {
