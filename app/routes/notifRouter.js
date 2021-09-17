@@ -7,4 +7,5 @@ protectRouter(router);
 router.get("/", notifController.getNotifs);
 router.delete("/:notifId", notifController.deleteNotif);
 router.patch("/:notifId", notifController.readNotif);
+router.delete("/", notifController.deleteNotifs);
 module.exports = router;
