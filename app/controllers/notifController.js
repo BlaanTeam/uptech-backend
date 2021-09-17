@@ -131,9 +131,27 @@ const readNotif = async (req, res, next) => {
     }
 };
 
+const deleteNotifs = async (req, res, next) => {
+    try {
+        let currentUser = req.currentUser;
+        let notifs = await Notif.deleteMany({ receiver: currentUser._id });
+        if (notifs.deletedCount === 0) {
+            res.status(304);
+            res.end();
+            return;
+        }
+        console.log(notifs);
+        res.status(204);
+        res.end();
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
     addNotif,
     getNotifs,
     deleteNotif,
     readNotif,
+    deleteNotifs,
 };
