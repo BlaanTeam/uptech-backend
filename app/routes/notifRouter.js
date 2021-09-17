@@ -6,4 +6,5 @@ const notifController = require("../controllers/notifController");
 protectRouter(router);
 router.get("/", notifController.getNotifs);
 router.delete("/:notifId", notifController.deleteNotif);
+router.patch("/:notifId", notifController.readNotif);
 module.exports = router;
