@@ -109,8 +109,31 @@ const deleteNotif = async (req, res, next) => {
     }
 };
 
+const readNotif = async (req, res, next) => {
+    try {
+        let currentUser = req.currentUser;
+        let { notifId } = await notifValidator(req.params, { notifId: 2 });
+        let notif = await Notif.findOne({ _id: notifId });
+        if (!notif) throw createError.NotFound();
+        else if (notif.receiver.toString() !== currentUser._id.toString())
+            throw createError.Forbidden();
+        else if (notif.isRead) {
+            res.status(304);
+            res.end();
+            return;
+        }
+        notif.isRead = true;
+        notif.updatedAt = Date.now();
+        await notif.save();
+        res.json(notif);
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
     addNotif,
     getNotifs,
     deleteNotif,
+    readNotif,
 };
