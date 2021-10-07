@@ -46,6 +46,18 @@ const userSchema = new Schema({
             trim: true,
             match: [pattern.bio, "Please fill a valid bio"],
         },
+        location: {
+            type: String,
+            trim: true,
+        },
+        website: {
+            type: String,
+            trim: true,
+            match: [pattern.url, "Please fill a valid website link"],
+        },
+        birthday: {
+            type: Date,
+        },
     },
     mailConfirmed: {
         type: Boolean,
