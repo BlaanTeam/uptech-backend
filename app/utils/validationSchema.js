@@ -148,6 +148,13 @@ const profileValidator = async (credentials, selectors) => {
                     .pattern(pattern.bio)
                     .message("Please fill a valid bio")
                     .trim(),
+                location: joi.string().min(2).max(255).trim(),
+                website: joi
+                    .string()
+                    .pattern(pattern.url)
+                    .message("Please fill a valid website link")
+                    .trim(),
+                birthday: joi.date(),
             }),
         });
         profileSchema = validator(profileSchema, selectors);
