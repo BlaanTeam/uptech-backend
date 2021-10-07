@@ -292,18 +292,121 @@ const sendMessage = async (req, res, next) => {
                 $unwind: "$user",
             },
             {
+                $lookup: {
+                    from: "follows",
+                    let: {
+                        userOne: "$userId",
+                        userTwo: "$otherUserId",
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        {
+                                            $eq: ["$userOne", "$$userOne"],
+                                        },
+                                        {
+                                            $eq: ["$userTwo", "$$userTwo"],
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            $project: {
+                                status: 1,
+                            },
+                        },
+                    ],
+                    as: "followOne",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$followOne",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $lookup: {
+                    from: "follows",
+                    let: {
+                        userOne: "$otherUserId",
+                        userTwo: "$user._id",
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        {
+                                            $eq: ["$userOne", "$$userOne"],
+                                        },
+                                        {
+                                            $eq: ["$userTwo", "$$userTwo"],
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            $project: {
+                                status: 1,
+                            },
+                        },
+                    ],
+                    as: "followTwo",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$followTwo",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $addFields: {
+                    blockedByViewer: {
+                        $cond: {
+                            if: {
+                                $eq: ["$followOne.status", 4],
+                            },
+                            then: true,
+                            else: false,
+                        },
+                    },
+                    hasBlockedViewer: {
+                        $cond: {
+                            if: {
+                                $eq: ["$followTwo.status", 4],
+                            },
+                            then: true,
+                            else: false,
+                        },
+                    },
+                },
+            },
+            {
                 $project: {
                     __v: 0,
                     userIds: 0,
                     messages: 0,
+                    followOne: 0,
+                    followTwo: 0,
                 },
             },
         ]);
         conv = conv[0];
         if (!conv) {
             throw createError.NotFound();
-        } else if (!conv.isOwner) {
+        } else if (
+            !conv.isOwner ||
+            conv.hasBlockedViewer ||
+            conv.blockedByViewer
+        ) {
             // check if the user is the owner of this conversation
+            // check if the user is blocked the other user or versa vice
             throw createError.Forbidden();
         }
         let message = await Message.create({
