@@ -549,7 +549,10 @@ const getMessages = async (req, res, next) => {
                 },
             },
             {
-                $unwind: "$followOne",
+                $unwind: {
+                    path: "$followOne",
+                    preserveNullAndEmptyArrays: true,
+                },
             },
             {
                 $lookup: {
@@ -583,7 +586,10 @@ const getMessages = async (req, res, next) => {
                 },
             },
             {
-                $unwind: "$followTwo",
+                $unwind: {
+                    path: "$followTwo",
+                    preserveNullAndEmptyArrays: true,
+                },
             },
             {
                 $addFields: {
