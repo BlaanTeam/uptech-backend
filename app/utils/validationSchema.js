@@ -67,7 +67,6 @@ const authValidator = async (credentials, selectors) => {
     } catch (err) {
         if (err.isJoi) {
             err.status = 400;
-            err.code = 1049;
             // TODO add message in  production
             // err.message = "Missing or invalid fields.";
         }
@@ -88,7 +87,6 @@ const postValidator = async (credentials, selectors) => {
     } catch (err) {
         if (err.isJoi) {
             err.status = 400;
-            err.code = 1049;
             // TODO add message in  production
             // err.message = "Missing or invalid fields.";
         }
@@ -113,7 +111,6 @@ const commentValidator = async (credentials, selectors) => {
     } catch (err) {
         if (err.isJoi) {
             err.status = 400;
-            err.code = 1049;
             // TODO add message in  production
             // err.message = "Missing or invalid fields.";
         }
@@ -162,7 +159,6 @@ const profileValidator = async (credentials, selectors) => {
     } catch (err) {
         if (err.isJoi) {
             err.status = 400;
-            err.code = 1049;
             // TODO add message in  production
             // err.message = "Missing or invalid fields.";
         }
@@ -182,7 +178,6 @@ const followValidator = async (credentials, selectors) => {
     } catch (err) {
         if (err.isJoi) {
             err.status = 400;
-            err.code = 1049;
             // TODO add message in  production
             // err.message = "Missing or invalid fields.";
         }
@@ -204,7 +199,6 @@ const chatValidator = async (credentials, selectors) => {
     } catch (err) {
         if (err.isJoi) {
             err.status = 400;
-            err.code = 1049;
             // TODO add message in  production
             // err.message = "Missing or invalid fields.";
         }
@@ -223,7 +217,6 @@ const notifValidator = async (credentials, selectors) => {
     } catch (err) {
         if (err.isJoi) {
             err.status = 400;
-            err.code = 1049;
             // TODO add message in  production
             // err.message = "Missing or invalid fields.";
         }
