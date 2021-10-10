@@ -1,4 +1,3 @@
-const { createError: cE } = require("../utils/globals");
 const createError = require("http-errors");
 const { Post, Comment, Like, Tag } = require("../models/postModel");
 const { Follow } = require("../models/authModel");
@@ -944,12 +943,12 @@ const addComment = async (req, res, next) => {
             content: 1,
         });
         let post = await Post.findOne({ _id: params.postId }, { __v: 0 });
-        if (!post) throw new cE("Post Not Found !", 1021, 404);
+        if (!post) throw createError.NotFound();
         else if (
             post.isPrivate === true &&
             post.user.toString() !== req.currentUser._id.toString()
         ) {
-            throw new cE("You don't have permission !", 1003, 403);
+            throw createError.Forbidden();
         }
         let comment = new Comment({
             content: data.content,
@@ -996,12 +995,12 @@ const getComment = async (req, res, next) => {
             path: "user",
             select: "_id",
         });
-        if (!post) throw new cE("Post Not Found !", 1021, 404);
+        if (!post) throw createError.NotFound();
         else if (
             post.isPrivate === true &&
             post.user._id.toString() !== req.currentUser._id.toString()
         ) {
-            throw new cE("You don't have permission !", 1003, 403);
+            throw createError.Forbidden();
         }
         let comment = await Comment.findOne(
             { _id: params.commentId },
@@ -1015,9 +1014,9 @@ const getComment = async (req, res, next) => {
                 path: "user",
                 select: "userName profile",
             });
-        if (!comment) throw new cE("Comment Not Found !", 1022, 404);
+        if (!comment) throw createError.NotFound();
         // else if (comment.postId._id.toString() !== post._id.toString()) {
-        //   throw new cE("You don't have permission !", 1003, 403);
+        //   throw new createError.Forbidden();
         // }
         res.json(comment);
     } catch (err) {
@@ -1047,12 +1046,12 @@ const updateComment = async (req, res, next) => {
             path: "user",
             select: "_id",
         });
-        if (!post) throw new cE("Post Not Found !", 1021, 404);
+        if (!post) createError.NotFound();
         else if (
             post.isPrivate === true &&
             post.user._id.toString() !== req.currentUser._id.toString()
         ) {
-            throw new cE("You don't have permission !", 1003, 403);
+            throw createError.Forbidden();
         }
         let comment = await Comment.findOne(
             { _id: params.commentId },
@@ -1061,14 +1060,14 @@ const updateComment = async (req, res, next) => {
             path: "user",
             select: "userName profile",
         });
-        if (!comment) throw new cE("Comment Not Found !", 1022, 404);
+        if (!comment) throw createError.NotFound();
         else if (comment.postId.toString() !== post._id.toString()) {
-            throw new cE("You don't have permission !", 1003, 403);
+            throw createError.Forbidden();
         } else if (
             req.currentUser._id.toString() !== post.user._id.toString() &&
             req.currentUser._id.toString() !== comment.user._id.toString()
         ) {
-            throw new cE("You don't have permission !", 1003, 403);
+            throw createError.Forbidden();
         }
         comment.content = data.content;
         comment.updatedAt = Date.now();
@@ -1103,12 +1102,12 @@ const deleteComment = async (req, res, next) => {
                 path: "user",
                 select: "_id userName",
             });
-        if (!post) throw new cE("Post Not Found !", 1021, 404);
+        if (!post) throw createError.NotFound();
         else if (
             post.isPrivate === true &&
             post.user._id.toString() !== req.currentUser._id.toString()
         ) {
-            throw new cE("You don't have permission !", 1003, 403);
+            throw new createError.Forbidden();
         }
         let comment = await Comment.findOne(
             { _id: params.commentId },
@@ -1117,14 +1116,14 @@ const deleteComment = async (req, res, next) => {
             path: "user",
             select: "userName profile",
         });
-        if (!comment) throw new cE("Comment Not Found !", 1022, 404);
+        if (!comment) throw createError.NotFound();
         else if (comment.postId.toString() !== post._id.toString()) {
-            throw new cE("You don't have permission !", 1003, 403);
+            throw new createError.Forbidden();
         } else if (
             req.currentUser._id.toString() !== post.user._id.toString() &&
             req.currentUser._id.toString() !== comment.user._id.toString()
         ) {
-            throw new cE("You don't have permission !", 1003, 403);
+            throw new createError.Forbidden();
         }
         let deletedComment = await Post.findOneAndUpdate(
             { _id: params.postId },
