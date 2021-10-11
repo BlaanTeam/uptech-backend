@@ -2429,6 +2429,20 @@ const getUserFollowing = async (req, res, next) => {
                                                                 else: false,
                                                             },
                                                         },
+                                                        isOwner: {
+                                                            $cond: {
+                                                                if: {
+                                                                    $eq: [
+                                                                        "$_id",
+                                                                        req
+                                                                            .currentUser
+                                                                            ._id,
+                                                                    ],
+                                                                },
+                                                                then: true,
+                                                                else: false,
+                                                            },
+                                                        },
                                                     },
                                                 },
                                                 {
@@ -2441,6 +2455,7 @@ const getUserFollowing = async (req, res, next) => {
                                                         hasBlockedViewer: 1,
                                                         hasRequestedViewer: 1,
                                                         hasRejectedViewer: 1,
+                                                        isOwner: 1,
                                                         userName: 1,
                                                         profile: 1,
                                                         isPrivate: 1,
