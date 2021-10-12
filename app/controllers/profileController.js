@@ -2882,6 +2882,20 @@ const getUserFollowers = async (req, res, next) => {
                                                 },
                                                 {
                                                     $addFields: {
+                                                        isOwner: {
+                                                            $cond: {
+                                                                if: {
+                                                                    $eq: [
+                                                                        "$_id",
+                                                                        req
+                                                                            .currentUser
+                                                                            ._id,
+                                                                    ],
+                                                                },
+                                                                then: true,
+                                                                else: false,
+                                                            },
+                                                        },
                                                         blockedByViewer: {
                                                             $cond: {
                                                                 if: {
@@ -2993,6 +3007,7 @@ const getUserFollowers = async (req, res, next) => {
                                                         userName: 1,
                                                         profile: 1,
                                                         isPrivate: 1,
+                                                        isOwner: 1,
                                                     },
                                                 },
                                             ],
