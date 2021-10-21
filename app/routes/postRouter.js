@@ -2,7 +2,7 @@ const router = require("express").Router();
 const postController = require("../controllers/postController.js");
 const { protectRouter } = require("../utils/middlewares");
 
-protectRouter(router);
+router.use(protectRouter);
 router.get("/posts", postController.getFeedPosts);
 router.get("/posts/:postId", postController.getPost);
 router.post("/posts", postController.addPost);

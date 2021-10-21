@@ -3,21 +3,19 @@ const { User } = require("../models/authModel");
 const createError = require("http-errors");
 
 // this function will protect the route by check the access token if exist in headers and if really valid
-const protectRouter = (router) => {
-    router.use(async (req, res, next) => {
-        try {
-            if (!req.headers.hasOwnProperty("x-auth-token"))
-                throw createError.Unauthorized();
-            let accessToken = req.headers["x-auth-token"]?.trim();
-            let payload = await verifyAccessToken(accessToken);
-            let user = await User.findOne({ userName: payload.username });
-            if (!user && !user.mailConfirmed) throw createError.unauthorized();
-            req.currentUser = user;
-            next();
-        } catch (err) {
-            next(err);
-        }
-    });
+const protectRouter = async (req, res, next) => {
+    try {
+        if (!req.headers.hasOwnProperty("x-auth-token"))
+            throw createError.Unauthorized();
+        let accessToken = req.headers["x-auth-token"]?.trim();
+        let payload = await verifyAccessToken(accessToken);
+        let user = await User.findOne({ userName: payload.username });
+        if (!user && !user.mailConfirmed) throw createError.unauthorized();
+        req.currentUser = user;
+        next();
+    } catch (err) {
+        next(err);
+    }
 };
 // this function will protect the socketio from any unauthorized request
 const protectSocketIo = async (socket, next) => {

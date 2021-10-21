@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const profileController = require("../controllers/profileController");
 const { protectRouter } = require("../utils/middlewares");
-protectRouter(router);
+
+router.use(protectRouter);
 
 router.get("/:userName", profileController.getUser);
 router.patch("/", profileController.updateUser);

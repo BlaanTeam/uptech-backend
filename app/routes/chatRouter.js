@@ -3,7 +3,7 @@ const { protectRouter } = require("../utils/middlewares");
 const chatController = require("../controllers/chatController");
 
 // protect the router
-protectRouter(router);
+router.use(protectRouter);
 router.post("/", chatController.initConversation);
 router.get("/", chatController.getConversations);
 router.get("/:convId/messages", chatController.getMessages);

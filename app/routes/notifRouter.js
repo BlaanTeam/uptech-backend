@@ -3,7 +3,7 @@ const { protectRouter } = require("../utils/middlewares");
 const notifController = require("../controllers/notifController");
 
 // protect the router
-protectRouter(router);
+router.use(protectRouter);
 router.get("/", notifController.getNotifs);
 router.delete("/:notifId", notifController.deleteNotif);
 router.patch("/:notifId", notifController.readNotif);
