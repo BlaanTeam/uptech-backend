@@ -349,7 +349,8 @@ const updateUser = async (req, res, next) => {
         let user = req.currentUser;
         let data = await profileValidator(req.body, {
             isPrivate: 2,
-            userPass: 2,
+            currPass: 2,
+            newPass: 2,
             profile: 2,
         });
         if (Object.keys(data).length <= 1) {
@@ -361,9 +362,12 @@ const updateUser = async (req, res, next) => {
         if (typeof data.isPrivate !== "undefined") {
             user.isPrivate = data.isPrivate;
         }
-        if (typeof data.userPass !== "undefined") {
+        if (typeof data.currPass !== "undefined") {
+            // check if the currPass equal the userPass
+            let passMatched = await user.isValidPassword(data.currPass);
+            if (!passMatched) throw createError.Conflict();
             // change password and hash it
-            user.userPass = data.userPass;
+            user.userPass = data.newPass;
             await user.hashPassword();
         }
         if (typeof data.profile !== "undefined") {
@@ -377,6 +381,7 @@ const updateUser = async (req, res, next) => {
         res.status(204);
         res.end();
     } catch (err) {
+        console.log(err);
         next(err);
     }
 };

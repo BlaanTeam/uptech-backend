@@ -63,6 +63,7 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
+    // TODO : extract only needed properties
     const error = {
         ...err,
     };

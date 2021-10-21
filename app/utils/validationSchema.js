@@ -127,7 +127,11 @@ const profileValidator = async (credentials, selectors) => {
                 .message("Please fill a valid userName")
                 .lowercase()
                 .trim(),
-            userPass: joi
+            currPass: joi
+                .string()
+                .pattern(pattern.password)
+                .message("Please fill a valid password"),
+            newPass: joi
                 .string()
                 .pattern(pattern.password)
                 .message("Please fill a valid password"),
@@ -155,6 +159,7 @@ const profileValidator = async (credentials, selectors) => {
             }),
         });
         profileSchema = validator(profileSchema, selectors);
+        profileSchema = profileSchema.with("currPass", ["newPass"]); // make newPass required if currPass exist
         return await profileSchema.validateAsync(credentials);
     } catch (err) {
         if (err.isJoi) {
