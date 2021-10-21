@@ -14,7 +14,7 @@ const {
 } = require("./config/config");
 
 // Include middlewares
-
+const { errorHandler } = require("./utils/middlewares");
 // Include API's routes
 const authRouter = require("./routes/authRouter");
 const postRouter = require("./routes/postRouter");
@@ -62,16 +62,6 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
-    // TODO : extract only needed properties
-    const error = {
-        ...err,
-    };
-    error.msg = error.message;
-    delete error.message;
-    // return json response to client
-    res.status(err.status || 500);
-    res.json({ error });
-});
+app.use(errorHandler);
 
 module.exports = server;

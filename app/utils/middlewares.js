@@ -37,7 +37,19 @@ const protectSocketIo = async (socket, next) => {
     }
 };
 
+const errorHandler = async (err, req, res, next) => {
+    const props = err.props || {};
+    const error = {
+        status: err.status,
+        msg: err.message,
+        ...props,
+    };
+    res.status(err.status || 500);
+    res.json({ error });
+};
+
 module.exports = {
     protectRouter,
     protectSocketIo,
+    errorHandler,
 };
