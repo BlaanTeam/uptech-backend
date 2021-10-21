@@ -1,3 +1,6 @@
+# ignore startup.sh
+startup.sh
+
 # Logs
 logs
 *.log
