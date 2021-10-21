@@ -65,7 +65,7 @@ const signIn = async (req, res, next) => {
         if (!isMatched) {
             throw createError.Unauthorized();
         } else if (!isConfirmed)
-            throw createError(401, null, { notConfirmed: true });
+            throw createError(401, null, { props: { notConfirmed: true } });
         let accessToken = await signAccessToken(user.userName, data.rememberMe);
         resp = { user: { ...user._doc }, accessToken: accessToken };
         delete resp.user.userPass;
