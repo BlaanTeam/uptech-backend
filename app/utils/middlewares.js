@@ -10,7 +10,7 @@ const protectRouter = async (req, res, next) => {
         let accessToken = req.headers["x-auth-token"]?.trim();
         let payload = await verifyAccessToken(accessToken);
         let user = await User.findOne({ userName: payload.username });
-        if (!user && !user.mailConfirmed) throw createError.unauthorized();
+        if (!user || !user.mailConfirmed) throw createError.Unauthorized();
         req.currentUser = user;
         next();
     } catch (err) {
