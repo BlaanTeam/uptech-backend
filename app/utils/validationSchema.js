@@ -56,10 +56,6 @@ const authValidator = async (credentials, selectors) => {
                 .pattern(pattern.password)
                 .message("Please fill a valid password"),
             rememberMe: joi.boolean().default(false),
-            token: joi
-                .string()
-                .pattern(pattern.jwtToken)
-                .message("Please fill a valid token"),
             userId: objectId("Post Doesn't Exist!", { postNotFound: true }),
         });
         authSchema = validator(authSchema, selectors);
