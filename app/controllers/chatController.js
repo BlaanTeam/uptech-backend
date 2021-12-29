@@ -482,6 +482,31 @@ const getMessages = async (req, res, next) => {
             },
             {
                 $addFields: {
+                    isOwner: {
+                        $cond: [
+                            {
+                                $eq: [
+                                    {
+                                        $size: {
+                                            $filter: {
+                                                input: "$userIds",
+                                                as: "array",
+                                                cond: {
+                                                    $eq: [
+                                                        "$$array",
+                                                        currentUser._id,
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                    },
+                                    1,
+                                ],
+                            },
+                            true,
+                            false,
+                        ],
+                    }, 
                     user: {
                         $filter: {
                             input: "$userIds",
@@ -619,6 +644,7 @@ const getMessages = async (req, res, next) => {
                     user: 1,
                     blockedByViewer: 1,
                     hasBlockedViewer: 1,
+                    isOwner:1
                 },
             },
             {
@@ -715,6 +741,8 @@ const getMessages = async (req, res, next) => {
         if (!conv) {
             throw createError.NotFound();
         }
+        else if (!conv.isOwner)
+            throw createError.Forbidden();
         res.json(conv);
     } catch (err) {
         next(err);
